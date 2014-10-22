@@ -12,3 +12,4 @@ Icon?
 /.idea/*
 websocket/node_modules/
 node_modules
+public/images/*
