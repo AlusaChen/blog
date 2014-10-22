@@ -140,12 +140,12 @@ module.exports = function(app) {
 	app.post('/upload', checkLogin);
 	app.post('/upload', function (req, res) {
 		var info = req.files.upfile;
-		var target_path = './public/images/' + info.name;
+		var target_path = './public/images/upload/' + info.name;
 		fs.renameSync(info.path, target_path);
 		var ret = {
 			originalName : info.originalFilename,
 			name : info.name,
-			url : '/images/' + info.name,
+			url : '/images/upload/' + info.name,
 			size : info.size,
 			type : path.extname(info.name),
 			state : 'SUCCESS'
