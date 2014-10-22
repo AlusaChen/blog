@@ -20,7 +20,7 @@ app.set('view engine', 'ejs');
 
 app.use(flash());
 //app.use(express.favicon());
-app.use(express.favicon(path.join(__dirname, 'public/images/alusa.ico')));
+app.use(express.favicon(path.join(__dirname, 'public/alusa.ico')));
 app.use(express.logger('dev'));
 //app.use(express.json());
 //app.use(express.urlencoded());
