@@ -13,3 +13,4 @@ Icon?
 websocket/node_modules/
 node_modules
 public/images/upload/
+public/images/tmpupload/

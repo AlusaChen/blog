@@ -1,8 +1,11 @@
 var crypto = require('crypto'),
 	fs = require('fs'),
 	path = require('path'),
+	settings = require('../settings'),
 	User = require('../models/user'),
-	Post = require('../models/post');
+	Post = require('../models/post'),
+	Upload = require('../classes/upload')
+	;
 
 module.exports = function(app) {
 	app.get('/', function(req, res) {
@@ -128,6 +131,7 @@ module.exports = function(app) {
 				ret.message = 'Post succeed!';
 			}
 
+			res.set('Context-Type', 'text/json');
 			res.json(ret);
 
 		});
@@ -135,18 +139,11 @@ module.exports = function(app) {
 
 	app.post('/upload', checkLogin);
 	app.post('/upload', function (req, res) {
-		var info = req.files.upfile;
-		var target_path = './public/images/upload/' + info.name;
-		fs.renameSync(info.path, target_path);
-		var ret = {
-			originalName : info.originalFilename,
-			name : info.name,
-			url : '/images/upload/' + info.name,
-			size : info.size,
-			type : path.extname(info.name),
-			state : 'SUCCESS'
-		};
-		res.send(JSON.stringify(ret));
+		var newUpload = new Upload(req);
+		newUpload.upFile();
+		newUpload.getFileInfo(function(ret) {
+			res.send(JSON.stringify(ret));
+		});
 	});
 
 
