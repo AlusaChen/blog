@@ -113,29 +113,25 @@ module.exports = function(app) {
 		});
 	});
 
+	//ajax
     app.post('/post', checkLogin);
 	app.post('/post', function(req, res) {
 		var currentUser = req.session.user,
 			post = new Post(currentUser.name, req.body.title, req.body.post);
 		post.save(function(err) {
+			var ret = {};
 			if (err) {
-				req.flash('error', err); 
-				return res.redirect('/');
+				ret.code = -1;
+				ret.message = err;
+			} else {
+				ret.code = 1;
+				ret.message = 'Post succeed!';
 			}
-			req.flash('success', 'Post succeed!');
-			return res.redirect('/');
+
+			res.json(ret);
+
 		});
 	});
-
-    app.get('/upload', checkLogin);
-    app.get('/upload', function(req, res) {
-		res.render('upload', {
-			title: 'upload',
-			user: req.session.user,
-			success: req.flash('success').toString(),
-			error: req.flash('error').toString()
-		});
-    });
 
 	app.post('/upload', checkLogin);
 	app.post('/upload', function (req, res) {
