@@ -11,3 +11,4 @@ Icon?
 /.idea
 /.idea/*
 websocket/node_modules/
+node_modules
