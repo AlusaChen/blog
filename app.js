@@ -11,6 +11,14 @@ var MongoStore = require('connect-mongo')(express);
 var settings = require('./settings');
 var flash = require('connect-flash');
 
+//handler error log
+/*
+var fs = require('fs');
+var accessLog = fs.createWriteStream('access.log', {flags: 'a'});
+var errorLog = fs.createWriteStream('error.log', {flags: 'a'});
+*/
+
+
 var app = express();
 
 // all environments
@@ -22,6 +30,7 @@ app.use(flash());
 //app.use(express.favicon());
 app.use(express.favicon(path.join(__dirname, 'public/images/alusa.ico')));
 app.use(express.logger('dev'));
+//app.use(express.logger({stream : accessLog}));
 //app.use(express.json());
 //app.use(express.urlencoded());
 //app.use(express.bodyParser());//=json + urlencode + multipart
@@ -42,6 +51,22 @@ app.use(express.session({
 
 app.use(app.router);
 app.use(express.static(path.join(__dirname, 'public')));
+
+/*
+//log error
+app.use(function(err, req, res, next) {
+	var meta = '[' + new Date() + '] ' + req.url + '\n';
+	errorLog.write(meta + err.stack + '\n');
+	next();
+});
+*/
+
+/*
+app.use(function(err, req, res, next) {
+	if(!err) return next(); // you also need this line
+    res.render("500");
+});
+*/
 
 // development only
 if ('development' == app.get('env')) {

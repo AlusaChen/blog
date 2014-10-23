@@ -11,4 +11,11 @@ module.exports = {
     uploadPath : 'tmpupload', //  public/images/tmpupload/  mkdir if not exists
     maxSize : 1000, //max size kb
     allowFiles : [".gif" , ".png" , ".jpg" , ".jpeg" , ".bmp"],
+
+    //############# page ####################
+    everyPage : 10,
+
+    //############# tags ####################
+    tags : ['technology', 'education', 'sports', 'social']
+
 };

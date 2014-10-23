@@ -10,9 +10,11 @@
 <header>
 <h1><%= title %></h1>
 </header>
-
+<span><form action="/search" method="GET"><input type="text" name="keyword" placeholder="SEARCH" class="search" /></form></span>
 <nav>
 <span><a title="index" href="/">home</a></span>
+<span><a title="archive" href="/archive">archive</a></span>
+<span><a title="tags" href="/tags">tags</a></span>
 
 <% if(user){ %>
 	<span><a title="post" href="/post">post</a></span>
@@ -22,7 +24,9 @@
 	<span><a title="register" href="/reg">register</a></span>
 <% } %>
 
+<span><a title="friend links" href="/links">links</a></span>
 </nav>
+
 
 <article>
 <% if (success) { %>

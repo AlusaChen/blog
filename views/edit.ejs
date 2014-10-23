@@ -6,14 +6,16 @@
 <script type="text/javascript" charset="utf-8" src="/ueditor/umeditor.min.js"></script>
 <script type="text/javascript" src="/ueditor/lang/zh-cn/zh-cn.js"></script>
 
-<p>title :</p> <input type="text" name="title" value="">
-<p>tags :</p>
-<% tags.forEach(function(tag, index) { %>
-    <input class="article_tags" type="checkbox" name="tags[]" value="<%= tag %>" id="tag_<%= index %>" /><label for="tag_<%= index %>"><%= tag %></label>
-<% }) %>
-<br />
+<p>title :</p> <input type="text" name="title" value="<%= post.title %>" disabled="disabled" >
+<% if(post.tags.length) { %>
+    <p>tags :
+    <% post.tags.forEach(function(tag, index){ %>
+        <%= tag %>
+    <% }); %>
+<% } %>
 <p>content : </p>
 <script type="text/plain" id="myEditor" style="width:1000px;height:240px;">
+   	<%- post.post %>
 </script>
 
 <button class="btn" onclick="sendData()">submit</button>
@@ -21,25 +23,18 @@
 <script type="text/javascript">
 var um = UM.getEditor('myEditor');
 function sendData() {
-    var article_tags = [];
-    $('.article_tags:checked').each(function(index, tag){
-        article_tags.push($(tag).val());
-    });
-    if(article_tags.length == 0) article_tags = null;
-    $.post('/post', {
-            title : $('[name=title]').val(),
-            post : UM.getEditor('myEditor').getContent(),
-            tags : article_tags
-        }, function(ret){
+	var url = '/edit/<%= post._id %>';
+    $.post(url, {title : $('[name=title]').val()?$('[name=title]').val():'test',post : UM.getEditor('myEditor').getContent()}, function(ret){
         if(!ret)
         {
-            alert('post error');
+            alert('Edit error');
             return;
         }
 
         if(ret.code == 1)
         {
-            location.href = '/';
+        	var gourl = '/p/<%= post._id %>';
+            location.href = gourl;
             return;
         }
         else {
