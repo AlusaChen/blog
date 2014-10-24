@@ -1,5 +1,6 @@
 var mongodb = require('./db'),
- 	ObjectID = require('mongodb').ObjectID
+ 	ObjectID = require('mongodb').ObjectID,
+	async = require('async')
  	;
 
 function Comment(_id, comment) {
@@ -11,16 +12,18 @@ Comment.prototype.save = function(callback) {
 	var _id = this._id,
 		comment = this.comment;
 
-	mongodb.open(function(err, db) {
-		if(err) {
-			return callback(err);
-		}
-		db.collection('posts', function(err, collection) {
-			if(err) {
-				mongodb.close();
-				return callback(err);
-			}
-
+	async.waterfall([
+		function(cb) {
+			mongodb.open(function(err, db) {
+				cb(err, db);
+			});
+		},
+		function(db, cb) {
+			db.collection('posts', function(err, collection) {
+				cb(err, collection);
+			});
+		},
+		function(collection, cb) {
 			collection.update({
 				"_id": new ObjectID(_id)
 			}, {
@@ -28,13 +31,12 @@ Comment.prototype.save = function(callback) {
 					"comments" : comment
 				}
 			}, function(err) {
-				mongodb.close();
-				if(err) {
-					return callback(err);
-				}
-				callback(null);
+				cb(err);
 			});
-		});
+		}
+	], function(err) {
+		mongodb.close();
+		callback(err);
 	});
 }
 

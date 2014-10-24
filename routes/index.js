@@ -212,8 +212,8 @@ module.exports = function(app) {
 	});
 
 	app.get('/search', function (req, res) {
-		Post.search(req.query.keyword, function (err, ret) {
-			if (err) {
+		Post.search(encodeURIComponent(req.query.keyword), function (err, ret) {
+			if (err) {      
 				req.flash('error', err); 
 				return res.redirect('/');
 			}

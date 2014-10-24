@@ -1,6 +1,7 @@
 var mongodb = require('./db'),
  	ObjectID = require('mongodb').ObjectID,
-	settings = require('../settings')
+	settings = require('../settings'),
+	async = require('async')
 ;
 
 function Post(name, head, title, tags, post) {
@@ -35,136 +36,134 @@ Post.prototype.save = function(callback) {
 		pv : 0
 	};
 
-	mongodb.open(function(err, db) {
-		if(err) {
-			return callback(err);
-		}
-		db.collection('posts', function(err, collection) {
-			if(err) {
-				mongodb.close();
-				return callback(err);
-			}
-
+	async.waterfall([
+		function(cb) {
+			mongodb.open(function(err, db) {
+				cb(err, db);
+			});
+		},
+		function(db, cb) {
+			db.collection('posts', function(err, collection) {
+				cb(err, collection);
+			});
+		},
+		function(collection, cb) {
 			collection.insert(post, {
 				safe : true
 			}, function(err, ret) {
-				mongodb.close();
-				if(err) {
-					return callback(err);
-				}
-				//ret[0]
-				callback(null);
+				cb(err, ret);
 			});
-		});
+		}
+	], function(err, ret) {
+		mongodb.close();
+		callback(err, ret[0]);
 	});
 }
 
 Post.get = function(name, callback) {
-	mongodb.open(function(err, db) {
-		if(err) {
-			return callback(err);
-		}
-		db.collection('posts', function(err, collection) {
-			if(err) {
-				mongodb.close();
-				return callback(err);
-			}
-
+	async.waterfall([
+		function(cb) {
+			mongodb.open(function(err, db) {
+				cb(err, db);
+			});
+		},
+		function(db, cb) {
+			db.collection('posts', function(err, collection) {
+				cb(err, collection);
+			});
+		},
+		function(collection, cb) {
 			var query = {};
 			if(name) {
 				query.name = name;
 			}
-
 			collection.find(query).sort({
 				time : -1
 			}).toArray(function(err, ret) {
-				mongodb.close();
-				if(err) {
-					return callback(err);
-				}
-				callback(null, ret);
+				cb(err, ret);
 			});
-		})
+		},
+	], function(err, ret) {
+		mongodb.close();
+		callback(err, ret);
 	});
 }
 
 Post.getOne = function(_id, callback) {
-	mongodb.open(function(err, db) {
-		if(err) {
-			return callback(err);
-		}
-		db.collection('posts', function(err, collection) {
-			if(err) {
-				mongodb.close();
-				return callback(err);
-			}
-
+	async.waterfall([
+		function(cb) {
+			mongodb.open(function(err, db) {
+				cb(err, db);
+			});
+		},
+		function(db, cb) {
+			db.collection('posts', function(err, collection) {
+				cb(err, collection);
+			});
+		},
+		function(collection, cb) {
 			collection.findOne({
 				"_id": new ObjectID(_id)
 			}, function(err, ret) {
-				if(err) {
-					mongodb.close();
-					return callback(err);
-				}
-
-				if(ret) {
-					collection.update({
-						"_id" : new ObjectID(_id)
-					}, {
-						"$inc" : {"pv" : 1}
-					}, function(err) {
-						mongodb.close();
-						if(err) {
-							return callback(err);
-						}
-						return callback(null, ret);
-					});
-				}
-				else
-				{
-					mongodb.close();
-					return callback('article doesn\'t exist');
-				}
+				cb(err, collection, ret);
 			});
-		});
+		},
+		function(collection, ret, cb) {
+			if(!ret) {
+				return cb('article doesn\'t exist');
+			}
+			collection.update({
+				"_id" : new ObjectID(_id)
+			}, {
+				"$inc" : {"pv" : 1}
+			}, function(err) {
+				cb(err, ret);
+			});
+		}
+	], function(err, ret) {
+		mongodb.close();
+		callback(err, ret);
 	});
 }
 
 Post.edit = function(_id, callback) {
-	mongodb.open(function(err, db) {
-		if(err) {
-			return callback(err);
-		}
-		db.collection('posts', function(err, collection) {
-			if(err) {
-				mongodb.close();
-				return callback(err);
-			}
-
+	async.waterfall([
+		function(cb) {
+			mongodb.open(function(err, db) {
+				cb(err, db);
+			});
+		},
+		function(db, cb) {
+			db.collection('posts', function(err, collection) {
+				cb(err, collection);
+			});
+		},
+		function(collection, cb) {
 			collection.findOne({
 				"_id" : ObjectID(_id)
 			}, function(err, ret) {
-				mongodb.close();
-				if(err) {
-					return callback(err);
-				}
-				callback(null, ret);
+				cb(err, ret);
 			});
-		});
+		}
+	], function(err, ret) {
+		mongodb.close();
+		callback(err, ret);
 	});
 }
 
 Post.update = function(name, _id, post, callback) {
-	mongodb.open(function(err, db) {
-		if(err) {
-			return callback(err);
-		}
-		db.collection('posts', function(err, collection) {
-			if(err) {
-				mongodb.close();
-				return callback(err);
-			}
-
+	async.waterfall([
+		function(cb) {
+			mongodb.open(function(err, db) {
+				cb(err, db);
+			});
+		},
+		function(db, cb) {
+			db.collection('posts', function(err, collection) {
+				cb(err, collection);
+			});
+		},
+		function(collection, cb) {
 			collection.update({
 				"name" : name,
 				"_id" : ObjectID(_id)
@@ -173,123 +172,124 @@ Post.update = function(name, _id, post, callback) {
 					"post" : post
 				}
 			}, function(err) {
-				mongodb.close();
-				if(err) {
-					return callback(err);
-				}
-				return callback(null);
+				cb(err);
 			});
-		});
+		}
+	], function(err) {
+		mongodb.close();
+		callback(err);
 	});
 }
 
 Post.remove = function(name, _id, callback) {
-	mongodb.open(function(err, db) {
-		if(err) {
-			return callback(err);
-		}
-		db.collection('posts', function(err, collection) {
-			if(err) {
-				mongodb.close();
-				return callback(err);
-			}
-
+	async.waterfall([
+		function(cb) {
+			mongodb.open(function(err, db) {
+				cb(err, db);
+			});
+		},
+		function(db, cb) {
+			db.collection('posts', function(err, collection) {
+				cb(err, collection);
+			});
+		},
+		function(collection, cb) {
 			collection.findOne({
 				"name" : name,
 				"_id" : ObjectID(_id)
 			}, function(err, ret) {
-				if(err) {
-					mongodb.close();
-					return callback(err);
-				}
-				var reprint_from = "";
-				if(ret.reprint_info.reprint_from) {
-					reprint_from = ret.reprint_info.reprint_from;
-				}
-				if(reprint_from != "") {
-					collection.update({
-						"_id" : reprint_from._id
-					}, {
-						"$pull" : {
-							"reprint_info.reprint_to" : {
-								"_id" : ObjectID(_id)
-							}
-						}
-					}, function(err) {
-						if(err) {
-							mongodb.close();
-							return callback(err);
-						}
-					});
-				}
-
-				collection.remove({
-					"_id" : ObjectID(_id)
-				}, {
-					w : 1
-				}, function(err) {
-					mongodb.close();
-					if(err) {
-						return callback(err);
-					}
-					return callback(null);
-				});
+				cb(err, collection, ret);
 			});
-		});
+		},
+		function(collection, ret, cb) {
+			var reprint_from = "";
+			if(ret.reprint_info.reprint_from) {
+				reprint_from = ret.reprint_info.reprint_from;
+			}
+
+			if(reprint_from != "") {
+				collection.update({
+					"_id" : reprint_from._id
+				}, {
+					"$pull" : {
+						"reprint_info.reprint_to" : {
+							"_id" : ObjectID(_id)
+						}
+					}
+				}, function(err) {
+					cb(err, collection);
+				});
+			} else {
+				cb(null, collection);
+			}
+		},
+		function(collection, cb) {
+			collection.remove({
+				"_id" : ObjectID(_id)
+			}, {
+				w : 1
+			}, function(err) {
+				cb(err);
+			});
+		}
+	], function(err) {
+		mongodb.close();
+		callback(err);
 	});
 }
 
 Post.gets = function(name, page, callback, nums) {
 	if(!nums) nums = settings.everyPage;
-	mongodb.open(function(err, db) {
-		if(err) {
-			return callback(err);
-		}
-		db.collection('posts', function(err, collection) {
-			if(err) {
-				mongodb.close();
-				return callback(err);
-			}
-
+	async.waterfall([
+		function(cb) {
+			mongodb.open(function(err, db){
+				cb(err, db);
+			});
+		},
+		function(db, cb) {
+			db.collection('posts', function(err, collection) {
+				cb(err, collection);
+			});
+		},
+		function(collection, cb) {
 			var query = {};
 			if(name) {
 				query.name = name;
 			}
 
 			collection.count(query, function(err, total) {
-				if(err) {
-					mongodb.close();
-					return callback(err);
-				}
-
-				collection.find(query, {
-					skip : (page - 1) * nums,
-					limit : nums
-				}).sort({
-					time : -1
-				}).toArray(function(err, ret) {
-					mongodb.close();
-					if(err) {
-						return callback(err);
-					}
-					callback(null, ret, total);
-				});
+				cb(err, collection, query, total);
 			});
-		});
+		},
+		function(collection, query, total, cb) {
+			collection.find(query, {
+				skip : (page - 1) * nums,
+				limit : nums
+			}).sort({
+				time : -1
+			}).toArray(function(err, ret) {
+				cb(err, ret, total);
+			});
+		},
+	], function(err, ret, total) {
+		mongodb.close();
+		callback(err, ret, total);
 	});
 }
 
 Post.getArchive = function(callback) {
-	mongodb.open(function(err, db) {
-		if(err) {
-			return callback(err);
-		}
-		db.collection('posts', function(err, collection) {
-			if(err) {
-				mongodb.close();
-				return callback(err);
-			}
-
+	async.waterfall([
+		function(cb) {
+			mongodb.open(function(err, db) {
+				cb(err, db);
+			});
+		},
+		function(db, cb) {
+			db.collection('posts', function(err, collection) {
+				cb(err, collection);
+			});
+		},
+		function(collection, cb) {
 			collection.find({}, {
 				"name" : 1,
 				"time" : 1,
@@ -297,120 +297,122 @@ Post.getArchive = function(callback) {
 			}).sort({
 				time : -1
 			}).toArray(function(err, ret) {
-				mongodb.close();
-				if(err) {
-					return callback(err);
-				}
-				callback(null, ret);
+				cb(err, ret);
 			});
-		});
+		}
+	], function(err, ret) {
+		mongodb.close();
+		callback(err, ret);
 	});
 }
 
 Post.getTags = function(callback) {
-	mongodb.open(function(err, db) {
-		if(err) {
-			return callback(err);
-		}
-		db.collection('posts', function(err, collection) {
-			if(err) {
-				mongodb.close();
-				return callback(err);
-			}
-			collection.distinct("tags", function(err, ret) {
-				mongodb.close();
-				if(err) {
-					return callback(err);
-				}
-				callback(null, ret);
+	async.waterfall([
+		function(cb) {
+			mongodb.open(function(err, db) {
+				cb(err, db);
 			});
-		});
+		},
+		function(db, cb) {
+			db.collection('posts', function(err, collection) {
+				cb(err, collection);
+			});
+		},
+		function(collection, cb) {
+			collection.distinct("tags", function(err, ret) {
+				cb(err, ret);
+			});
+		}
+	], function(err, ret) {
+		mongodb.close();
+		callback(err, ret);
 	});
 }
 
 Post.getTag = function(tag, callback) {
-	mongodb.open(function(err, db) {
-		if(err) {
-			return callback(err);
-		}
-		db.collection('posts', function(err, collection) {
-			if(err) {
-				mongodb.close();
-				return callback(err);
-			}
-
+	async.waterfall([
+		function(cb) {
+			mongodb.open(function(err, db) {
+				cb(err, db);
+			});
+		},
+		function(db, cb) {
+			db.collection('posts', function(err, collection) {
+				cb(err, collection);
+			});
+		},
+		function(collection, cb) {
 			collection.find({
 				"tags" : tag
 			}).sort({
 				time : -1
 			}).toArray(function(err, ret) {
-				mongodb.close();
-				if(err) {
-					return callback(err);
-				}
-				callback(null, ret);
+				cb(err, ret);
 			});
-		})
+		}
+	], function(err, ret) {
+		mongodb.close();
+		callback(err, ret);
 	});
 }
 
 Post.search = function(keyword, callback) {
-	mongodb.open(function(err, db) {
-		if(err) {
-			return callback(err);
-		}
-		db.collection('posts', function(err, collection) {
-			if(err) {
-				mongodb.close();
-				return callback(err);
-			}
-
-			var pattern = new RegExp("^.*" + keyword + ".*$", "i");
+	async.waterfall([
+		function(cb){
+			mongodb.open(function(err, db) {
+				cb(err, db);
+			});
+		},
+		function(db, cb) {
+			db.collection('posts', function(err, collection) {
+				cb(err, collection);
+			});
+		},
+		function(collection, cb) {
+			var pattern = new RegExp("^.*" + decodeURIComponent(keyword) + ".*$", "i");
 			collection.find({
 				"title" : pattern
 			}).sort({
 				time : -1
 			}).toArray(function(err, ret) {
-				mongodb.close();
-				if(err) {
-					return callback(err);
-				}
-				callback(null, ret);
+				cb(err, ret);
 			});
-		})
+		}
+	], function(err, ret) {
+		mongodb.close();
+		callback(err, ret);
 	});
 }
 
 Post.reprint = function(touser, _id, callback) {
-	mongodb.open(function(err, db) {
-		if(err) {
-			return callback(err);
-		}
-		db.collection('posts', function(err, collection) {
-			if(err) {
-				mongodb.close();
-				return callback(err);
-			}
-
+	async.waterfall([
+		function(cb) {
+			mongodb.open(function(err, db) {
+				cb(err, db);
+			});
+		},
+		function(db, cb) {
+			db.collection('posts', function(err, collection) {
+				cb(err, collection);
+			});
+		},
+		function(collection, cb) {
 			collection.findOne({
 				"_id" : ObjectID(_id)
 			}, function(err, ret) {
-				if(err) {
-					mongodb.close();
-					return callback(err);
-				}
+				cb(err, collection, ret);
+			});
+		},
+		function(collection, ret, cb) {
+			if(!ret) {
+				return cb('article doesn\'t exist');
+			}
+			
+			if(ret.name == touser.name || ret.reprint_info.reprint_from.name == touser.name) {
+				return cb('can\'t reprint article of yourself');
+			}
 
-				if(!ret) {
-					mongodb.close();
-					return callback('article doesn\'t exist');
-				}
-
-				if(ret.name == touser.name) {
-					mongodb.close();
-					return callback('can\'t reprint article of yourself');
-				}
-
-				var date = new Date();
+			var date = new Date();
 				var time = {
 		            date: date,
 		            year : date.getFullYear(),
@@ -419,48 +421,50 @@ Post.reprint = function(touser, _id, callback) {
 		            minute : date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " + 
 		            date.getHours() + ":" + (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes())
 		        };
-		        delete ret._id;
+	        delete ret._id;
 
-		        ret.reprint_info = {
-		        	"reprint_from" : {
-		        		"_id" : ObjectID(_id),
-		        		"name" : ret.name
-		        	}
-		        };
-		        ret.name = touser.name;
-		        ret.head = touser.head;
-		        ret.time = time;
-		        ret.title = (ret.title.search(/[转载]/) > -1) ? ret.title : "[转载]" + ret.title;
-		        ret.comments = [];
-		        ret.pv = 0;
+	        ret.reprint_info = {
+	        	"reprint_from" : {
+	        		"_id" : ObjectID(_id),
+	        		"name" : ret.name
+	        	}
+	        };
+	        ret.name = touser.name;
+	        ret.head = touser.head;
+	        ret.time = time;
+	        ret.title = (ret.title.search(/[转载]/) > -1) ? ret.title : "[转载]" + ret.title;
+	        ret.comments = [];
+	        ret.pv = 0;
 
-		        collection.insert(ret, {
-					safe : true,
-				}, function(err, post) {
-					if(err) {
-						mongodb.close();
-						return callback(err);
-					}
 
-					collection.update({
-						"_id" : ObjectID(_id)
-					}, {
-						"$push" : {
-							"reprint_info.reprint_to" : {
-								"_id" : ObjectID(post[0]['_id']),
-								"name" : touser.name
-							}
-						}
-					}, function(err) {
-						mongodb.close();
-						if(err) {
-							return callback(err);
-						}
-						callback(err, post[0]);
-					});
-				});
+	        collection.insert(ret, {
+				safe : true,
+			}, function(err, post) {
+				cb(err, collection, post);
 			});
-		});
+		},
+		function(collection, post, cb) {
+			collection.update({
+				"_id" : ObjectID(_id)
+			}, {
+				"$push" : {
+					"reprint_info.reprint_to" : {
+						"_id" : ObjectID(post[0]['_id']),
+						"name" : touser.name
+					}
+				}
+			}, function(err) {
+				cb(err, post);
+			});
+		}
+	], function(err, ret) {
+		mongodb.close();
+		if(ret) {
+			callback(err, ret[0]);
+		}
+		else {
+			callback(err);
+		}
 	});
 }
 

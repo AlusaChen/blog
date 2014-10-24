@@ -1,5 +1,6 @@
 var crypto = require('crypto'),
-	mongodb = require('./db')
+	mongodb = require('./db'),
+	async = require('async')
 	;
 
 function User(user) {
@@ -20,50 +21,52 @@ User.prototype.save = function(callback) {
 		head : head
 	};
 
-	mongodb.open(function(err, db){
-		if(err) {
-			return callback(err);
-		}
-
-		db.collection('users', function(err, collection) {
-			if(err) {
-				mongodb.close();
-				return callback(err);
-			}
-
-			collection.insert(user, {
-				safe : true,
-			}, function(err, res){
-				mongodb.close();
-				if(err) {
-					return callback(err);
-				}
-				callback(null, res[0]);
+	async.waterfall([
+		function(cb) {
+			mongodb.open(function(err, db) {
+				cb(err, db);
 			});
-		});
+		},
+		function(db, cb) {
+			db.collection('users', function(err, collection) {
+				cb(err, collection);
+			});
+		},
+		function(collection, cb) {
+			collection.insert(user, {
+				safe : true
+			}, function(err, ret) {
+				cb(err, ret);
+			});
+		}
+	], function(err, ret) {
+		mongodb.close();
+		callback(err, ret[0]);
 	});
 }
 
 User.get = function(name, callback) {
-	mongodb.open(function(err, db) {
-		if(err) {
-			return callback(err);
-		}
-		db.collection('users', function(err, collection){
-			if (err){
-				mongodb.close();
-				return callback(err);
-			}
+	async.waterfall([
+		function(cb) {
+			mongodb.open(function(err, db) {
+				cb(err, db);
+			});
+		},
+		function(db, cb) {
+			db.collection('users', function(err, collection) {
+				cb(err, collection);
+			});
+		},
+		function(collection, cb) {
 			collection.findOne({
 				name : name
-			}, function(err, res) {
-				mongodb.close();
-				if(err) {
-					return callback(err);
-				}
-				callback(null, res);
+			}, function(err, ret) {
+				cb(err, ret);
 			});
-		})
+		}
+	], function(err, ret) {
+		mongodb.close();
+		callback(err, ret);
 	});
 }
 
