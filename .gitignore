@@ -15,5 +15,4 @@ node_modules
 public/images/upload/
 public/images/tmpupload/
 *.log
-/app.js
-
+app.js
