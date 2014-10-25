@@ -1,7 +1,10 @@
-var crypto = require('crypto'),
-	mongodb = require('./db'),
+var Db = require('./db'),
+	crypto = require('crypto'),
 	async = require('async')
 	;
+
+var pool = Db.pool;
+
 
 function User(user) {
 	this.name = user.name;
@@ -23,24 +26,24 @@ User.prototype.save = function(callback) {
 
 	async.waterfall([
 		function(cb) {
-			mongodb.open(function(err, db) {
+			pool.acquire(function(err, db) {
 				cb(err, db);
 			});
 		},
 		function(db, cb) {
 			db.collection('users', function(err, collection) {
-				cb(err, collection);
+				cb(err, db, collection);
 			});
 		},
-		function(collection, cb) {
+		function(db, collection, cb) {
 			collection.insert(user, {
 				safe : true
 			}, function(err, ret) {
-				cb(err, ret);
+				cb(err, db, ret);
 			});
 		}
-	], function(err, ret) {
-		mongodb.close();
+	], function(err, db, ret) {
+		pool.release(db);
 		callback(err, ret[0]);
 	});
 }
@@ -48,24 +51,24 @@ User.prototype.save = function(callback) {
 User.get = function(name, callback) {
 	async.waterfall([
 		function(cb) {
-			mongodb.open(function(err, db) {
+			pool.acquire(function(err, db) {
 				cb(err, db);
 			});
 		},
 		function(db, cb) {
 			db.collection('users', function(err, collection) {
-				cb(err, collection);
+				cb(err, db, collection);
 			});
 		},
-		function(collection, cb) {
+		function(db, collection, cb) {
 			collection.findOne({
 				name : name
 			}, function(err, ret) {
-				cb(err, ret);
+				cb(err, db, ret);
 			});
 		}
-	], function(err, ret) {
-		mongodb.close();
+	], function(err, db, ret) {
+		pool.release(db);
 		callback(err, ret);
 	});
 }

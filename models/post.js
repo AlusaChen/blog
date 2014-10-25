@@ -1,8 +1,10 @@
-var mongodb = require('./db'),
+var Db = require('./db'),
  	ObjectID = require('mongodb').ObjectID,
 	settings = require('../settings'),
 	async = require('async')
-;
+	;
+
+var pool = Db.pool;
 
 function Post(name, head, title, tags, post) {
 	this.name = name;
@@ -38,24 +40,24 @@ Post.prototype.save = function(callback) {
 
 	async.waterfall([
 		function(cb) {
-			mongodb.open(function(err, db) {
+			pool.acquire(function(err, db) {
 				cb(err, db);
 			});
 		},
 		function(db, cb) {
 			db.collection('posts', function(err, collection) {
-				cb(err, collection);
+				cb(err, db, collection);
 			});
 		},
-		function(collection, cb) {
+		function(db, collection, cb) {
 			collection.insert(post, {
 				safe : true
 			}, function(err, ret) {
-				cb(err, ret);
+				cb(err, db, ret);
 			});
 		}
-	], function(err, ret) {
-		mongodb.close();
+	], function(err, db, ret) {
+		pool.release(db);
 		callback(err, ret[0]);
 	});
 }
@@ -63,16 +65,16 @@ Post.prototype.save = function(callback) {
 Post.get = function(name, callback) {
 	async.waterfall([
 		function(cb) {
-			mongodb.open(function(err, db) {
+			pool.acquire(function(err, db) {
 				cb(err, db);
 			});
 		},
 		function(db, cb) {
 			db.collection('posts', function(err, collection) {
-				cb(err, collection);
+				cb(err, db, collection);
 			});
 		},
-		function(collection, cb) {
+		function(db, collection, cb) {
 			var query = {};
 			if(name) {
 				query.name = name;
@@ -80,11 +82,11 @@ Post.get = function(name, callback) {
 			collection.find(query).sort({
 				time : -1
 			}).toArray(function(err, ret) {
-				cb(err, ret);
+				cb(err, db, ret);
 			});
 		},
-	], function(err, ret) {
-		mongodb.close();
+	], function(err, db, ret) {
+		pool.release(db);
 		callback(err, ret);
 	});
 }
@@ -92,36 +94,36 @@ Post.get = function(name, callback) {
 Post.getOne = function(_id, callback) {
 	async.waterfall([
 		function(cb) {
-			mongodb.open(function(err, db) {
+			pool.acquire(function(err, db) {
 				cb(err, db);
 			});
 		},
 		function(db, cb) {
 			db.collection('posts', function(err, collection) {
-				cb(err, collection);
+				cb(err, db, collection);
 			});
 		},
-		function(collection, cb) {
+		function(db, collection, cb) {
 			collection.findOne({
 				"_id": new ObjectID(_id)
 			}, function(err, ret) {
-				cb(err, collection, ret);
+				cb(err, db, collection, ret);
 			});
 		},
-		function(collection, ret, cb) {
+		function(db, collection, ret, cb) {
 			if(!ret) {
-				return cb('article doesn\'t exist');
+				return cb('article doesn\'t exist', db);
 			}
 			collection.update({
 				"_id" : new ObjectID(_id)
 			}, {
 				"$inc" : {"pv" : 1}
 			}, function(err) {
-				cb(err, ret);
+				cb(err, db, ret);
 			});
 		}
-	], function(err, ret) {
-		mongodb.close();
+	], function(err, db, ret) {
+		pool.release(db);
 		callback(err, ret);
 	});
 }
@@ -129,24 +131,24 @@ Post.getOne = function(_id, callback) {
 Post.edit = function(_id, callback) {
 	async.waterfall([
 		function(cb) {
-			mongodb.open(function(err, db) {
+			pool.acquire(function(err, db) {
 				cb(err, db);
 			});
 		},
 		function(db, cb) {
 			db.collection('posts', function(err, collection) {
-				cb(err, collection);
+				cb(err, db, collection);
 			});
 		},
-		function(collection, cb) {
+		function(db, collection, cb) {
 			collection.findOne({
 				"_id" : ObjectID(_id)
 			}, function(err, ret) {
-				cb(err, ret);
+				cb(err, db, ret);
 			});
 		}
-	], function(err, ret) {
-		mongodb.close();
+	], function(err, db, ret) {
+		pool.release(db);
 		callback(err, ret);
 	});
 }
@@ -154,16 +156,16 @@ Post.edit = function(_id, callback) {
 Post.update = function(name, _id, post, callback) {
 	async.waterfall([
 		function(cb) {
-			mongodb.open(function(err, db) {
+			pool.acquire(function(err, db) {
 				cb(err, db);
 			});
 		},
 		function(db, cb) {
 			db.collection('posts', function(err, collection) {
-				cb(err, collection);
+				cb(err, db, collection);
 			});
 		},
-		function(collection, cb) {
+		function(db, collection, cb) {
 			collection.update({
 				"name" : name,
 				"_id" : ObjectID(_id)
@@ -172,11 +174,11 @@ Post.update = function(name, _id, post, callback) {
 					"post" : post
 				}
 			}, function(err) {
-				cb(err);
+				cb(err, db);
 			});
 		}
-	], function(err) {
-		mongodb.close();
+	], function(err, db) {
+		pool.release(db);
 		callback(err);
 	});
 }
@@ -184,24 +186,24 @@ Post.update = function(name, _id, post, callback) {
 Post.remove = function(name, _id, callback) {
 	async.waterfall([
 		function(cb) {
-			mongodb.open(function(err, db) {
+			pool.acquire(function(err, db) {
 				cb(err, db);
 			});
 		},
 		function(db, cb) {
 			db.collection('posts', function(err, collection) {
-				cb(err, collection);
+				cb(err, db, collection);
 			});
 		},
-		function(collection, cb) {
+		function(db, collection, cb) {
 			collection.findOne({
 				"name" : name,
 				"_id" : ObjectID(_id)
 			}, function(err, ret) {
-				cb(err, collection, ret);
+				cb(err, db, collection, ret);
 			});
 		},
-		function(collection, ret, cb) {
+		function(db, collection, ret, cb) {
 			var reprint_from = "";
 			if(ret.reprint_info.reprint_from) {
 				reprint_from = ret.reprint_info.reprint_from;
@@ -217,23 +219,23 @@ Post.remove = function(name, _id, callback) {
 						}
 					}
 				}, function(err) {
-					cb(err, collection);
+					cb(err, db, collection);
 				});
 			} else {
-				cb(null, collection);
+				cb(null, db, collection);
 			}
 		},
-		function(collection, cb) {
+		function(db, collection, cb) {
 			collection.remove({
 				"_id" : ObjectID(_id)
 			}, {
 				w : 1
 			}, function(err) {
-				cb(err);
+				cb(err, db);
 			});
 		}
-	], function(err) {
-		mongodb.close();
+	], function(err, db) {
+		pool.release(db);
 		callback(err);
 	});
 }
@@ -242,54 +244,55 @@ Post.gets = function(name, page, callback, nums) {
 	if(!nums) nums = settings.everyPage;
 	async.waterfall([
 		function(cb) {
-			mongodb.open(function(err, db){
+			pool.acquire(function(err, db) {
 				cb(err, db);
 			});
 		},
 		function(db, cb) {
 			db.collection('posts', function(err, collection) {
-				cb(err, collection);
+				cb(err, db, collection);
 			});
 		},
-		function(collection, cb) {
+		function(db, collection, cb) {
 			var query = {};
 			if(name) {
 				query.name = name;
 			}
 
 			collection.count(query, function(err, total) {
-				cb(err, collection, query, total);
+				cb(err, db, collection, query, total);
 			});
 		},
-		function(collection, query, total, cb) {
+		function(db, collection, query, total, cb) {
 			collection.find(query, {
 				skip : (page - 1) * nums,
 				limit : nums
 			}).sort({
 				time : -1
 			}).toArray(function(err, ret) {
-				cb(err, ret, total);
+				cb(err, db, ret, total);
 			});
 		},
-	], function(err, ret, total) {
-		mongodb.close();
+	], function(err, db, ret, total) {
+		pool.release(db);
 		callback(err, ret, total);
 	});
 }
 
+
 Post.getArchive = function(callback) {
 	async.waterfall([
 		function(cb) {
-			mongodb.open(function(err, db) {
+			pool.acquire(function(err, db) {
 				cb(err, db);
 			});
 		},
 		function(db, cb) {
 			db.collection('posts', function(err, collection) {
-				cb(err, collection);
+				cb(err, db, collection);
 			});
 		},
-		function(collection, cb) {
+		function(db, collection, cb) {
 			collection.find({}, {
 				"name" : 1,
 				"time" : 1,
@@ -297,34 +300,35 @@ Post.getArchive = function(callback) {
 			}).sort({
 				time : -1
 			}).toArray(function(err, ret) {
-				cb(err, ret);
+				cb(err, db, ret);
 			});
 		}
-	], function(err, ret) {
-		mongodb.close();
+	], function(err, db, ret) {
+		pool.release(db);
 		callback(err, ret);
 	});
 }
 
+
 Post.getTags = function(callback) {
 	async.waterfall([
 		function(cb) {
-			mongodb.open(function(err, db) {
+			pool.acquire(function(err, db) {
 				cb(err, db);
 			});
 		},
 		function(db, cb) {
 			db.collection('posts', function(err, collection) {
-				cb(err, collection);
+				cb(err, db, collection);
 			});
 		},
-		function(collection, cb) {
+		function(db, collection, cb) {
 			collection.distinct("tags", function(err, ret) {
-				cb(err, ret);
+				cb(err, db, ret);
 			});
 		}
-	], function(err, ret) {
-		mongodb.close();
+	], function(err, db, ret) {
+		pool.release(db);
 		callback(err, ret);
 	});
 }
@@ -332,54 +336,54 @@ Post.getTags = function(callback) {
 Post.getTag = function(tag, callback) {
 	async.waterfall([
 		function(cb) {
-			mongodb.open(function(err, db) {
+			pool.acquire(function(err, db) {
 				cb(err, db);
 			});
 		},
 		function(db, cb) {
 			db.collection('posts', function(err, collection) {
-				cb(err, collection);
+				cb(err, db, collection);
 			});
 		},
-		function(collection, cb) {
+		function(db, collection, cb) {
 			collection.find({
 				"tags" : tag
 			}).sort({
 				time : -1
 			}).toArray(function(err, ret) {
-				cb(err, ret);
+				cb(err, db, ret);
 			});
 		}
-	], function(err, ret) {
-		mongodb.close();
+	], function(err, db, ret) {
+		pool.release(db);
 		callback(err, ret);
 	});
 }
 
 Post.search = function(keyword, callback) {
 	async.waterfall([
-		function(cb){
-			mongodb.open(function(err, db) {
+		function(cb) {
+			pool.acquire(function(err, db) {
 				cb(err, db);
 			});
 		},
 		function(db, cb) {
 			db.collection('posts', function(err, collection) {
-				cb(err, collection);
+				cb(err, db, collection);
 			});
 		},
-		function(collection, cb) {
+		function(db, collection, cb) {
 			var pattern = new RegExp("^.*" + decodeURIComponent(keyword) + ".*$", "i");
 			collection.find({
 				"title" : pattern
 			}).sort({
 				time : -1
 			}).toArray(function(err, ret) {
-				cb(err, ret);
+				cb(err, db, ret);
 			});
 		}
-	], function(err, ret) {
-		mongodb.close();
+	], function(err, db, ret) {
+		pool.release(db);
 		callback(err, ret);
 	});
 }
@@ -387,29 +391,29 @@ Post.search = function(keyword, callback) {
 Post.reprint = function(touser, _id, callback) {
 	async.waterfall([
 		function(cb) {
-			mongodb.open(function(err, db) {
+			pool.acquire(function(err, db) {
 				cb(err, db);
 			});
 		},
 		function(db, cb) {
 			db.collection('posts', function(err, collection) {
-				cb(err, collection);
+				cb(err, db, collection);
 			});
 		},
-		function(collection, cb) {
+		function(db, collection, cb) {
 			collection.findOne({
 				"_id" : ObjectID(_id)
 			}, function(err, ret) {
-				cb(err, collection, ret);
+				cb(err, db, collection, ret);
 			});
 		},
-		function(collection, ret, cb) {
+		function(db, collection, ret, cb) {
 			if(!ret) {
-				return cb('article doesn\'t exist');
+				return cb('article doesn\'t exist', db);
 			}
 			
 			if(ret.name == touser.name || ret.reprint_info.reprint_from.name == touser.name) {
-				return cb('can\'t reprint article of yourself');
+				return cb('can\'t reprint article of yourself', db);
 			}
 
 			var date = new Date();
@@ -440,10 +444,10 @@ Post.reprint = function(touser, _id, callback) {
 	        collection.insert(ret, {
 				safe : true,
 			}, function(err, post) {
-				cb(err, collection, post);
+				cb(err, db, collection, post);
 			});
 		},
-		function(collection, post, cb) {
+		function(db, collection, post, cb) {
 			collection.update({
 				"_id" : ObjectID(_id)
 			}, {
@@ -454,11 +458,11 @@ Post.reprint = function(touser, _id, callback) {
 					}
 				}
 			}, function(err) {
-				cb(err, post);
+				cb(err, db, post);
 			});
 		}
-	], function(err, ret) {
-		mongodb.close();
+	], function(err, db, ret) {
+		pool.release(db);
 		if(ret) {
 			callback(err, ret[0]);
 		}

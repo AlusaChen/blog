@@ -12,6 +12,7 @@
     "connect-mongo": "*",
     "connect-flash": "*",
     "async" : "*",
-    "phpjs" : "*"
+    "phpjs" : "*",
+    "generic-pool" : "*"
   }
 }
