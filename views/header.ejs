@@ -7,6 +7,7 @@
 	<meta name="keywords" content="" />
 	<!--[if lte IE 8]><script src="/stylesheets/ie/html5shiv.js"></script><![endif]-->
 	<script src="/javascripts/jquery.min.js"></script>
+	<script src="/javascripts/pjax.js"></script>
 	<script src="/javascripts/skel.min.js"></script>
 	<script src="/javascripts/skel-layers.min.js"></script>
 	<script src="/javascripts/init.js"></script>
@@ -18,6 +19,38 @@
 	</noscript>
 	<!--[if lte IE 8]><link rel="stylesheet" href="/stylesheets/ie/v8.css" /><![endif]-->
 </head>
+<script type="text/javascript">
+$(function(){
+	//$('#sidebar #nav a').pjax('#content .inner');
+
+	$.pjax({
+        selector: '#sidebar #nav a',
+        container: '#content .inner', //内容替换的容器
+        show: 'fade',  //展现的动画，支持默认和fade, 可以自定义动画方式，这里为自定义的function即可。
+        cache: false,  //是否使用缓存
+        storage: false,  //是否使用本地存储
+        titleSuffix: '', //标题后缀
+        timeout : 3000,//等待请求时间
+        filter: function(href, obj)
+        {
+        	return false;//true 则不使用pjax
+        },
+        callback: function(status)
+        {
+            /*
+            var type = status.type;
+            switch(type)
+            {
+                case 'success': console.log('success') ;break; //正常
+                case 'cache': console.log('cache') ;break; //读取缓存 
+                case 'error': console.log(status) ;break; //发生异常
+                case 'hash':  console.log('hash') ;break; //只是hash变化
+            }
+            */
+        }
+    })
+});
+</script>
 
 <body class="left-sidebar">
 

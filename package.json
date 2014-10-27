@@ -13,6 +13,7 @@
     "connect-flash": "*",
     "async" : "*",
     "phpjs" : "*",
-    "generic-pool" : "*"
+    "generic-pool" : "*",
+    "express-pjax" : "*"
   }
 }

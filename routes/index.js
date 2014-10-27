@@ -15,7 +15,7 @@ module.exports = function(app) {
 			if(err) {
 				ret = [];
 			}
-			res.render('index', {
+			res.renderPjax('index', {
 				title : 'Blog',
 				user : req.session.user,
 				posts : ret,
@@ -26,7 +26,7 @@ module.exports = function(app) {
 				error : req.flash('error').toString(),
 				currentUrl : '/',
 			});
-		})
+		});
 	});
 
 	app.get('/recent_posts', function(req, res) {
@@ -50,7 +50,7 @@ module.exports = function(app) {
 	});
 
 	app.get('/test', function(req, res) {
-		res.render('test', {
+		res.renderPjax('test', {
 			title : 'test'
 		});
 		
@@ -58,7 +58,7 @@ module.exports = function(app) {
 
     app.get('/reg', checkNotLogin);
 	app.get('/reg', function(req, res) {
-		res.render('reg', {
+		res.renderPjax('reg', {
 			title: 'Register',
 			user : req.session.user,
 			success : req.flash('success').toString(),
@@ -107,7 +107,7 @@ module.exports = function(app) {
 
     app.get('/login', checkNotLogin);
 	app.get('/login', function(req, res) {
-		res.render('login', {
+		res.renderPjax('login', {
 			title : 'Login',
 			user : req.session.user,
 			success : req.flash('success').toString(),
@@ -142,7 +142,7 @@ module.exports = function(app) {
 
     app.get('/post', checkLogin);
 	app.get('/post', function(req, res) {
-		res.render('post', {
+		res.renderPjax('post', {
 			title : 'Post',
 			user : req.session.user,
 			tags : settings.tags,
@@ -189,7 +189,7 @@ module.exports = function(app) {
 				req.flash('error', err);
 				return res.redirect('/');
 			}
-			res.render('archive', {
+			res.renderPjax('archive', {
 				title: 'archive',
 				posts: ret,
 				user: req.session.user,
@@ -207,7 +207,7 @@ module.exports = function(app) {
 				req.flash('error', err); 
 				return res.redirect('/');
 			}
-			res.render('tags', {
+			res.renderPjax('tags', {
 				title: 'Tags',
 				posts: ret,
 				user: req.session.user,
@@ -224,7 +224,7 @@ module.exports = function(app) {
 				req.flash('error', err); 
 				return res.redirect('/');
 			}
-			res.render('tag', {
+			res.renderPjax('tag', {
 				title: req.params.tag,
 				posts: ret,
 				user: req.session.user,
@@ -236,7 +236,7 @@ module.exports = function(app) {
 	});
 
 	app.get('/links', function (req, res) {
-		res.render('links', {
+		res.renderPjax('links', {
 			title: "Friend Links",
 			user: req.session.user,
 			success: req.flash('success').toString(),
@@ -252,7 +252,7 @@ module.exports = function(app) {
 				req.flash('error', err); 
 				return res.redirect('/');
 			}
-			res.render('search', {
+			res.renderPjax('search', {
 				title: req.query.keyword,
 				posts: ret,
 				user: req.session.user,
@@ -279,7 +279,7 @@ module.exports = function(app) {
 					return res.redirect('/');
 				}
 
-				res.render('user', {
+				res.renderPjax('user', {
 					title: user.name,
 					posts: ret,
 			        page: page,
@@ -302,7 +302,7 @@ module.exports = function(app) {
 				return res.redirect('/');
 			}
 
-			res.render('article', {
+			res.renderPjax('article', {
 				title: ret.title,
 				post: ret,
 				user: req.session.user,
@@ -354,7 +354,7 @@ module.exports = function(app) {
 				req.flash('error', 'not access');
 				return res.redirect('/');
 			}
-			res.render('edit', {
+			res.renderPjax('edit', {
 				title: 'Edit',
 				post: ret,
 				user: req.session.user,

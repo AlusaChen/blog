@@ -10,6 +10,7 @@ var path = require('path');
 var MongoStore = require('connect-mongo')(express);
 var settings = require('./settings');
 var flash = require('connect-flash');
+var pjax = require('express-pjax');
 
 //handler error log
 
@@ -26,6 +27,7 @@ app.set('port', process.env.PORT || 80);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
+app.use(pjax());
 app.use(flash());
 //app.use(express.favicon());
 app.use(express.favicon(path.join(__dirname, 'public/images/alusa.ico')));
