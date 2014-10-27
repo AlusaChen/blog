@@ -1,0 +1,51 @@
+article.box.post.post-excerpt
+   header
+    h2: a(href="/p/" + post._id)= post.title
+    if(user && (user.name == post.name))
+     span: a(href="/edit/" + post._id) Edit 
+     | &nbsp;&nbsp;
+     span: a(href="/remove/" + post._id) Remove
+    - var flag = 1
+    if (user && (user.name != post.name))
+     if ((post.reprint_info.reprint_from != undefined) && (user.name == post.reprint_info.reprint_from.name))
+      - flag = 0
+     if ((post.reprint_info.reprint_to != undefined)) 
+      - post.reprint_info.reprint_to.forEach(function (reprint_to, index) {
+       if (user.name == reprint_to.name)
+        - flag = 0
+      - })
+    else
+    - flag = 0
+    if (flag)
+     span: a(href="/reprint/" + post._id) reprint
+    p
+     if post.tags.length
+      | tags : 
+      - post.tags.forEach(function(tag){
+        a(href="/tags/" + tag)= tag 
+        | &nbsp;&nbsp;
+      - })
+     | author : 
+     a(href="/u/" + post.name)= post.name
+     | &nbsp;
+     a(href="/u/" + post.name): img(src=post.head)
+     if (post.reprint_info.reprint_from)
+      br 
+      a(href="/p/" + post.reprint_info.reprint_from._id) origin link
+   .info
+    span.date
+     - var d = post.time.date;
+     span.month= (d.getMonth() + 1)
+     span.day= d.getDate()
+     span.year= post.time.year
+    ul.stats
+     li: a.icon.fa-comment(href="#")= post.pv
+     li: a.icon.fa-comment(href="#")= post.comments.length
+     li: a.icon.fa-comment(href="#")
+      if post.reprint_info.reprint_to
+       = post.reprint_info.reprint_to.length
+      else
+       | 0
+   p!= post.post
+
+include comment

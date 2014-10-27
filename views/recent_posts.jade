@@ -1,0 +1,22 @@
+section.box.recent-posts
+ header: h2 Recent Posts
+ ul
+
+script(type="text/javascript").
+ $(function(){
+  $.get('/recent_posts', function(ret){
+   if(!ret) reutrn;
+   var _html = '';
+   if(ret.code == 1)
+   {
+    var posts = ret.data;
+    for(var i in posts)
+    {
+     _html += '<li><a href="/p/' + posts[i]._id  + '">' + posts[i].title + '</a></li>';
+    }
+   }
+   $('.box.recent-posts ul').html(_html);
+  });
+ });
+ 
+

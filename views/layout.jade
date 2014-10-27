@@ -1,0 +1,125 @@
+doctype html
+html(lang="en")
+  head
+   meta(charset='utf-8')
+   title #{title}
+   <!--[if lte IE 8]>
+   <script src="/stylesheets/ie/html5shiv.js"></script>
+   <![endif]-->
+   script(type="text/javascript", src="/javascripts/jquery.min.js")
+   script(type="text/javascript", src="/javascripts/pjax.js")
+   script(type="text/javascript", src="/javascripts/skel.min.js")
+   script(type="text/javascript", src="/javascripts/skel-layers.min.js")
+   script(type="text/javascript", src="/javascripts/init.js")
+   noscript
+    link(rel="stylesheet", href="/stylesheets/skel.css")
+    link(rel="stylesheet", href="/stylesheets/style.css")
+    link(rel="stylesheet", href="/stylesheets/style-desktop.css")
+    link(rel="stylesheet", href="/stylesheets/style-desktop.css")
+   <!--[if lte IE 8]>
+   <link rel="stylesheet" href="/stylesheets/ie/v8.css" />
+   <![endif]-->
+   script(type="text/javascript").
+      $(function(){
+       $.pjax({
+        selector: '#sidebar #nav a',
+        container: '#content .inner', //内容替换的容器
+        show: 'fade',  //展现的动画，支持默认和fade, 可以自定义动画方式，这里为自定义的function即可。
+        cache: false,  //是否使用缓存
+        storage: false,  //是否使用本地存储
+        titleSuffix: '', //标题后缀
+        timeout : 3000,//等待请求时间
+        filter: function(href, obj)
+        {
+          return false;//true 则不使用pjax
+        },
+        callback: function(status)
+        {
+            /*
+            var type = status.type;
+            switch(type)
+            {
+                case 'success': console.log('success') ;break; //正常
+                case 'cache': console.log('cache') ;break; //读取缓存 
+                case 'error': console.log(status) ;break; //发生异常
+                case 'hash':  console.log('hash') ;break; //只是hash变化
+            }
+            */
+        }
+       });
+      });
+body.left-sidebar
+ div#wrapper
+  div#content
+   div.inner
+    if success
+     div #{success}
+    if ( error )
+     div #{error}
+    !=body
+
+  div#sidebar
+   h1#logo: a(href="/") Micro Blog
+   nav#nav
+    ul
+     li: a(href="/", title="Home") Home
+     li: a(href="/archive", title="Archive") Archive
+     li: a(href="/tags", title="Tags") Tags
+     if user
+      li: a(href="/post", title="Post") Post
+      li: a(href="/logout", title="Logout") Logout
+     else 
+      li: a(href="/login", title="Login") Login
+      li: a(href="/reg", title="Register") Register
+     li: a(href="/links", title="Links") Links
+   section.box.search
+    form(action="/search", method="GET")
+     input.text(type="text", name="keyword", placeholder="SEARCH")
+   section.box.text-style1
+    div.innder
+     p
+      strong Micro blog : 
+      | Just do it.
+
+   include recent_posts
+   section.box.calendar
+    div.inner
+     table
+      caption July 2014
+      thead: tr
+       each val, index in {"Monday":"M", "Tuesday":"T", "Wednesday":"W", "Thursday":"T", "Friday":"F", "Saturday":"S", "Sunday":"S",}
+        th(scope="col", tilte=index)= val
+      tbody
+       tr
+        td.pad(colspan="4"): span&nbsp;
+        each val in [1, 2, 3]
+         td: span= val
+       tr
+        each val in [4, 5, 6, 7, 8, 9, 10]
+         td: span= val
+       tr
+        each val in [4, 5, 6, 7, 8, 9, 10]
+         td: span= val
+       - var n = 11
+       tr
+        while n <= 17
+          td: span= n++
+       tr
+        while n <= 24
+          td: span= n++
+       tr
+        while n <= 28
+          td: span= n++
+      
+   ul#copyright
+    li &copy; Micro Blog.
+    li Design : 
+     a(href="http://html5up.net") HTML5 UP
+
+
+
+
+
+
+
+

@@ -1,0 +1,42 @@
+link(rel="stylesheet", type="text/css", href="/ueditor/themes/default/css/umeditor.css")
+script(type="text/javascript", src="/ueditor/umeditor.config.js")
+script(type="text/javascript", src="/ueditor/umeditor.min.js")
+script(type="text/javascript", src="/ueditor/lang/zh-cn/zh-cn.js")
+article.box.post.post-excerpt
+ p
+  span Title 
+  input(type="text", name="title", value=post.title)
+ if(post.tags.length)
+ p
+  span Tags : 
+  - post.tags.forEach(function(tag, index){
+     span= tag 
+     |&nbsp;
+  - })
+ script#myEditor(type="text/plain", style="width:1000px;height:240px;")!= post.post
+ br
+ button.button(onclick="sendData()") Edit
+ .info: span Edit
+script(type="text/javascript").
+    var um = UM.getEditor('myEditor');
+    function sendData() {
+        var url = '/edit/#{post._id}';
+        $.post(url, {title : $('[name=title]').val()?$('[name=title]').val():'test',post : UM.getEditor('myEditor').getContent()}, function(ret){
+            if(!ret)
+            {
+                alert('Edit error');
+                return;
+            }
+
+            if(ret.code == 1)
+            {
+              var gourl = '/p/#{post._id}';
+                location.href = gourl;
+                return;
+            }
+            else {
+                alert(ret.message);
+            }
+        });
+    }
+

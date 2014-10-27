@@ -1,0 +1,11 @@
+article.box.post.post-excerpt
+ ul
+  - var lastYear = 0
+  - posts.forEach(function(post){
+    if(lastYear != post.time.year)
+     li: h3= post.time.year
+    - lastYear = post.time.year
+    li: time= post.time.day
+    li: a(href="/p/" + post._id)= post.title
+  - })
+ .info: span #{title}

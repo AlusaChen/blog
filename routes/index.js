@@ -354,7 +354,7 @@ module.exports = function(app) {
 				req.flash('error', 'not access');
 				return res.redirect('/');
 			}
-			res.renderPjax('edit', {
+			res.render('edit', {
 				title: 'Edit',
 				post: ret,
 				user: req.session.user,
@@ -420,7 +420,9 @@ module.exports = function(app) {
 	});
 
 	app.use(function (req, res) {
-		res.render("404");
+		res.render("404", {
+			layout : false
+		});
 	});
 
 	function checkLogin(req, res, next) {

@@ -1,0 +1,6 @@
+article.box.post.post-excerpt
+ ul
+  - posts.forEach(function(tag){
+    li: a(href="/tags/" + tag)= tag
+  - })
+ .info: span #{title}

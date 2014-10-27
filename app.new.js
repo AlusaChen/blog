@@ -4,6 +4,7 @@
  */
 
 var express = require('express');
+var partials = require('express-partials');
 var routes = require('./routes');
 var http = require('http');
 var path = require('path');
@@ -25,8 +26,9 @@ var app = express();
 // all environments
 app.set('port', process.env.PORT || 80);
 app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
+app.set('view engine', 'jade');
 
+app.use(partials());
 app.use(pjax());
 app.use(flash());
 //app.use(express.favicon());
