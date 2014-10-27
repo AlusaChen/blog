@@ -5,21 +5,35 @@
 <script type="text/javascript" charset="utf-8" src="/ueditor/umeditor.config.js"></script>
 <script type="text/javascript" charset="utf-8" src="/ueditor/umeditor.min.js"></script>
 <script type="text/javascript" src="/ueditor/lang/zh-cn/zh-cn.js"></script>
-
-<p>title :</p> <input type="text" name="title" value="<%= post.title %>" disabled="disabled" >
+<article class="box post post-excerpt">
+<p>Title <input type="text" name="title" value="<%= post.title %>" disabled="disabled" > </p>
 <% if(post.tags.length) { %>
     <p>tags :
     <% post.tags.forEach(function(tag, index){ %>
         <%= tag %>
     <% }); %>
+    </p>
 <% } %>
-<p>content : </p>
 <script type="text/plain" id="myEditor" style="width:1000px;height:240px;">
    	<%- post.post %>
 </script>
 
 <button class="btn" onclick="sendData()">submit</button>
-
+<div class="info">
+    <span class="date"><span class="month"><% var d = post.time.date; %><%= (d.getMonth() + 1) %><span>y</span></span> <span class="day"><%= d.getDate() %></span><span class="year">, <%= post.time.year %></span></span>
+    <ul class="stats">
+      <li><a href="#" class="icon fa-comment"><%= post.pv %></a></li>
+      <li><a href="#" class="icon fa-comment"><%= post.comments.length %></a></li>
+      <li><a href="#" class="icon fa-comment">
+        <% if (post.reprint_info.reprint_to) { %>
+          <%= post.reprint_info.reprint_to.length %>
+        <% } else { %>
+          <%= 0 %>
+        <% } %></a>
+      </li>
+    </ul>
+  </div>
+</article>
 <script type="text/javascript">
 var um = UM.getEditor('myEditor');
 function sendData() {

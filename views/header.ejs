@@ -1,37 +1,38 @@
-<!DOCTYPE html>
+<!DOCTYPE HTML>
 <html>
 <head>
-<meta charset="UTF-8" />
-<title>Blog</title>
-<link rel="stylesheet" href="/stylesheets/style.css">
+	<title>Blog</title>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta name="description" content="" />
+	<meta name="keywords" content="" />
+	<!--[if lte IE 8]><script src="/stylesheets/ie/html5shiv.js"></script><![endif]-->
+	<script src="/javascripts/jquery.min.js"></script>
+	<script src="/javascripts/skel.min.js"></script>
+	<script src="/javascripts/skel-layers.min.js"></script>
+	<script src="/javascripts/init.js"></script>
+	<noscript>
+		<link rel="stylesheet" href="/stylesheets/skel.css" />
+		<link rel="stylesheet" href="/stylesheets/style.css" />
+		<link rel="stylesheet" href="/stylesheets/style-desktop.css" />
+		<link rel="stylesheet" href="/stylesheets/style-wide.css" />
+	</noscript>
+	<!--[if lte IE 8]><link rel="stylesheet" href="/stylesheets/ie/v8.css" /><![endif]-->
 </head>
-<body>
 
-<header>
-<h1><%= title %></h1>
-</header>
-<span><form action="/search" method="GET"><input type="text" name="keyword" placeholder="SEARCH" class="search" /></form></span>
-<nav>
-<span><a title="index" href="/">home</a></span>
-<span><a title="archive" href="/archive">archive</a></span>
-<span><a title="tags" href="/tags">tags</a></span>
+<body class="left-sidebar">
 
-<% if(user){ %>
-	<span><a title="post" href="/post">post</a></span>
-  	<span><a title="logout" href="/logout">logout</a></span>
-<% }else{ %>
-	<span><a title="login" href="/login">login</a></span>
-	<span><a title="register" href="/reg">register</a></span>
-<% } %>
+	<!-- Wrapper -->
+		<div id="wrapper">
 
-<span><a title="friend links" href="/links">links</a></span>
-</nav>
+			<!-- Content -->
+				<div id="content">
+					<div class="inner">
+					<% if (success) { %>
+					  <div><%= success %></div>
+					<% } %>
+					<% if (error) { %>
+					  <div><%= error %> </div>
+					<% } %>
 
-
-<article>
-<% if (success) { %>
-  <div><%= success %></div>
-<% } %>
-<% if (error) { %>
-  <div><%= error %> </div>
-<% } %>
+				
+					

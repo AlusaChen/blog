@@ -1,3 +1,118 @@
-</article>
+
+				</div>
+			</div>
+
+			<!-- Sidebar -->
+			<div id="sidebar">
+			
+				<!-- Logo -->
+					<h1 id="logo"><a href="/">Micro Blog</a></h1>
+			
+				<!-- Nav -->
+					<nav id="nav">
+						<ul>
+							<li class="<%= currentUrl == '/' ? 'current':'' %>"><a title="index" href="/">Home</a></li>
+							<li class="<%= currentUrl == '/archive' ? 'current':'' %>"><a title="archive" href="/archive">Archive</a></li>
+							<li class="<%= currentUrl == '/tags' ? 'current':'' %>"><a title="tags" href="/tags">Tags</a></li>
+
+							<% if(user){ %>
+								<li class="<%= currentUrl == '/post' ? 'current':'' %>"><a title="post" href="/post">Post</a></li>
+							  	<li class="<%= currentUrl == '/logout' ? 'current':'' %>"><a title="logout" href="/logout">Logout</a></li>
+							<% }else{ %>
+								<li class="<%= currentUrl == '/login' ? 'current':'' %>"><a title="login" href="/login">Login</a></li>
+								<li class="<%= currentUrl == '/reg' ? 'current':'' %>"><a title="register" href="/reg">Register</a></li>
+							<% } %>
+							<li class="<%= currentUrl == '/links' ? 'current':'' %>"><a title="friend links" href="/links">Links</a></li>
+						</ul>
+					</nav>
+
+				<!-- Search -->
+					<section class="box search">
+						<form action="/search" method="GET">
+							<input type="text" name="keyword" placeholder="SEARCH" class="text" />
+						</form>
+					</section>
+			
+				<!-- Text -->
+					<section class="box text-style1">
+						<div class="inner">
+							<p>
+								<strong>Micro blog:</strong> Just do it.
+							</p>
+						</div>
+					</section>
+			
+				<!-- Recent Posts -->
+					<% include recent_posts %>
+			
+				<!-- Calendar -->
+					<section class="box calendar">
+						<div class="inner">
+							<table>
+								<caption>July 2014</caption>
+								<thead>
+									<tr>
+										<th scope="col" title="Monday">M</th>
+										<th scope="col" title="Tuesday">T</th>
+										<th scope="col" title="Wednesday">W</th>
+										<th scope="col" title="Thursday">T</th>
+										<th scope="col" title="Friday">F</th>
+										<th scope="col" title="Saturday">S</th>
+										<th scope="col" title="Sunday">S</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td colspan="4" class="pad"><span>&nbsp;</span></td>
+										<td><span>1</span></td>
+										<td><span>2</span></td>
+										<td><span>3</span></td>
+									</tr>
+									<tr>
+										<td><span>4</span></td>
+										<td><span>5</span></td>
+										<td><a href="#">6</a></td>
+										<td><span>7</span></td>
+										<td><span>8</span></td>
+										<td><span>9</span></td>
+										<td><a href="#">10</a></td>
+									</tr>
+									<tr>
+										<td><span>11</span></td>
+										<td><span>12</span></td>
+										<td><span>13</span></td>
+										<td class="today"><a href="#">14</a></td>
+										<td><span>15</span></td>
+										<td><span>16</span></td>
+										<td><span>17</span></td>
+									</tr>
+									<tr>
+										<td><span>18</span></td>
+										<td><span>19</span></td>
+										<td><span>20</span></td>
+										<td><span>21</span></td>
+										<td><span>22</span></td>
+										<td><a href="#">23</a></td>
+										<td><span>24</span></td>
+									</tr>
+									<tr>
+										<td><a href="#">25</a></td>
+										<td><span>26</span></td>
+										<td><span>27</span></td>
+										<td><span>28</span></td>
+										<td class="pad" colspan="3"><span>&nbsp;</span></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</section>
+				
+				<!-- Copyright -->
+					<ul id="copyright">
+						<li>&copy; Micro Blog.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+					</ul>
+			</div>
+
+		</div>
 </body>
 </html>

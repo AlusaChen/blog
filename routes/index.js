@@ -24,8 +24,35 @@ module.exports = function(app) {
 				isLastPage: ((page - 1) * settings.everyPage + ret.length) == total,
 				success : req.flash('success').toString(),
 				error : req.flash('error').toString(),
+				currentUrl : '/',
 			});
 		})
+	});
+
+	app.get('/recent_posts', function(req, res) {
+		Post.gets(null, 1, function(err, posts, total) {
+			if(err) {
+				posts = [];
+			}
+			var ret = {};
+			if (err) {
+				ret.code = -1;
+				ret.message = err;
+			} else {
+				ret.code = 1;
+				ret.message = 'Post succeed!';
+				ret.data = posts;
+			}
+
+			res.set('Context-Type', 'text/json');
+			res.json(ret);
+		}, 5);
+	});
+
+	app.get('/test', function(req, res) {
+		res.render('test', {
+			title : 'test'
+		});
 		
 	});
 
@@ -36,6 +63,7 @@ module.exports = function(app) {
 			user : req.session.user,
 			success : req.flash('success').toString(),
 			error : req.flash('error').toString(),
+			currentUrl : '/reg',
 		});
 	});
 
@@ -84,6 +112,7 @@ module.exports = function(app) {
 			user : req.session.user,
 			success : req.flash('success').toString(),
 			error : req.flash('error').toString(),
+			currentUrl : '/login',
 		});
 	});
 
@@ -119,6 +148,7 @@ module.exports = function(app) {
 			tags : settings.tags,
 			success : req.flash('success').toString(),
 			error : req.flash('error').toString(),
+			currentUrl : '/post',
 		});
 	});
 
@@ -164,7 +194,8 @@ module.exports = function(app) {
 				posts: ret,
 				user: req.session.user,
 				success: req.flash('success').toString(),
-				error: req.flash('error').toString()
+				error: req.flash('error').toString(),
+				currentUrl : '/archive',
 			});
 		});
 	});
@@ -181,7 +212,8 @@ module.exports = function(app) {
 				posts: ret,
 				user: req.session.user,
 				success: req.flash('success').toString(),
-				error: req.flash('error').toString()
+				error: req.flash('error').toString(),
+				currentUrl : '/tags',
 			});
 		});
 	});
@@ -193,11 +225,12 @@ module.exports = function(app) {
 				return res.redirect('/');
 			}
 			res.render('tag', {
-				title: 'Tags : ' + req.params.tag,
+				title: req.params.tag,
 				posts: ret,
 				user: req.session.user,
 				success: req.flash('success').toString(),
-				error: req.flash('error').toString()
+				error: req.flash('error').toString(),
+				currentUrl : '/tags',
 			});
 		});
 	});
@@ -207,7 +240,9 @@ module.exports = function(app) {
 			title: "Friend Links",
 			user: req.session.user,
 			success: req.flash('success').toString(),
-			error: req.flash('error').toString()
+			error: req.flash('error').toString(),
+			currentUrl : '/links',
+
 		});
 	});
 
@@ -218,11 +253,12 @@ module.exports = function(app) {
 				return res.redirect('/');
 			}
 			res.render('search', {
-				title: "SEARCH:" + req.query.keyword,
+				title: req.query.keyword,
 				posts: ret,
 				user: req.session.user,
 				success: req.flash('success').toString(),
-				error: req.flash('error').toString()
+				error: req.flash('error').toString(),
+				currentUrl : '/search',
 			});
 		});
 	});
@@ -251,7 +287,8 @@ module.exports = function(app) {
 			        isLastPage: ((page - 1) * settings.everyPage + ret.length) == total,
 					user : req.session.user,
 					success : req.flash('success').toString(),
-					error : req.flash('error').toString()
+					error : req.flash('error').toString(),
+					currentUrl : '/u',
 				});
 			});
 		});
@@ -270,7 +307,8 @@ module.exports = function(app) {
 				post: ret,
 				user: req.session.user,
 				success: req.flash('success').toString(),
-				error: req.flash('error').toString()
+				error: req.flash('error').toString(),
+				currentUrl : '/p',
 			});
 		});
 	});
@@ -321,7 +359,8 @@ module.exports = function(app) {
 				post: ret,
 				user: req.session.user,
 				success: req.flash('success').toString(),
-				error: req.flash('error').toString()
+				error: req.flash('error').toString(),
+				currentUrl : '/edit',
 			});
 		});
 	});
@@ -383,6 +422,7 @@ module.exports = function(app) {
 	app.use(function (req, res) {
 		res.render("404");
 	});
+
 	function checkLogin(req, res, next) {
 		if(!req.session.user) {
 			req.flash('error', 'Doesn\'t login!');

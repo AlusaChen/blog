@@ -412,7 +412,7 @@ Post.reprint = function(touser, _id, callback) {
 				return cb('article doesn\'t exist', db);
 			}
 			
-			if(ret.name == touser.name || ret.reprint_info.reprint_from.name == touser.name) {
+			if(ret.name == touser.name || (ret.reprint_info.reprint_from && ret.reprint_info.reprint_from.name == touser.name)) {
 				return cb('can\'t reprint article of yourself', db);
 			}
 
@@ -436,7 +436,7 @@ Post.reprint = function(touser, _id, callback) {
 	        ret.name = touser.name;
 	        ret.head = touser.head;
 	        ret.time = time;
-	        ret.title = (ret.title.search(/[转载]/) > -1) ? ret.title : "[转载]" + ret.title;
+	        ret.title = (ret.title.search(/[reprint]/) > -1) ? ret.title : "[reprint]" + ret.title;
 	        ret.comments = [];
 	        ret.pv = 0;
 
