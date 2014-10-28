@@ -17,6 +17,5 @@
     "phpjs" : "*",
     "generic-pool" : "*",
     "express-pjax" : "*",
-    "express-pjax-redirect" : "*"
   }
 }
