@@ -11,18 +11,31 @@ html(lang="en")
    script(type="text/javascript", src="/javascripts/skel.min.js")
    script(type="text/javascript", src="/javascripts/skel-layers.min.js")
    script(type="text/javascript", src="/javascripts/init.js")
+
+   link(rel="stylesheet", type="text/css", href="/ueditor/themes/default/css/umeditor.css")
+   script(type="text/javascript", src="/ueditor/umeditor.config.js")
+   script(type="text/javascript", src="/ueditor/umeditor.min.js")
+   script(type="text/javascript", src="/ueditor/lang/zh-cn/zh-cn.js")
+
+
    noscript
     link(rel="stylesheet", href="/stylesheets/skel.css")
     link(rel="stylesheet", href="/stylesheets/style.css")
-    link(rel="stylesheet", href="/stylesheets/style-desktop.css")
     link(rel="stylesheet", href="/stylesheets/style-desktop.css")
    <!--[if lte IE 8]>
    <link rel="stylesheet" href="/stylesheets/ie/v8.css" />
    <![endif]-->
    script(type="text/javascript").
+      function showCurrentMenu()
+      {
+        var url = window.location.pathname;
+        $('#sidebar #nav li').removeClass('current');
+        $('#sidebar #nav a[href="'+ url +'"]').parent('li').addClass('current');
+      }
       $(function(){
+       showCurrentMenu();
        $.pjax({
-        selector: '#sidebar #nav a',
+        selector: 'a[notpjax!=yes]', //#sidebar #nav a
         container: '#content .inner', //内容替换的容器
         show: 'fade',  //展现的动画，支持默认和fade, 可以自定义动画方式，这里为自定义的function即可。
         cache: false,  //是否使用缓存
@@ -35,6 +48,8 @@ html(lang="en")
         },
         callback: function(status)
         {
+            showCurrentMenu();
+            $(window).trigger('resize');
             /*
             var type = status.type;
             switch(type)
@@ -49,16 +64,15 @@ html(lang="en")
        });
       });
 body.left-sidebar
- div#wrapper
-  div#content
-   div.inner
+ #wrapper
+  #content
+   .inner
     if success
      div #{success}
     if ( error )
      div #{error}
     !=body
-
-  div#sidebar
+  #sidebar
    h1#logo: a(href="/") Micro Blog
    nav#nav
     ul
@@ -67,7 +81,7 @@ body.left-sidebar
      li: a(href="/tags", title="Tags") Tags
      if user
       li: a(href="/post", title="Post") Post
-      li: a(href="/logout", title="Logout") Logout
+      li: a(href="/logout", title="Logout", notpjax="yes") Logout
      else 
       li: a(href="/login", title="Login") Login
       li: a(href="/reg", title="Register") Register

@@ -7,18 +7,30 @@ article.box.post.post-excerpt
   span Title 
   input(type="text", name="title", value=post.title)
  if(post.tags.length)
- p
-  span Tags : 
-  - post.tags.forEach(function(tag, index){
-     span= tag 
-     |&nbsp;
-  - })
+  p
+   span Tags : 
+   - post.tags.forEach(function(tag, index){
+      span= tag 
+      |&nbsp;
+   - })
  script#myEditor(type="text/plain", style="width:1000px;height:240px;")!= post.post
  br
  button.button(onclick="sendData()") Edit
  .info: span Edit
 script(type="text/javascript").
+    UM.clearCache('myEditor'); //for pjax
     var um = UM.getEditor('myEditor');
+
+    function resizeEditor()
+    {
+      $(window).resize(function(){
+        var width = $('#content').width();
+        um.setWidth(width);
+        var height = parseInt(width / 3);
+        um.setHeight(height);
+      });
+    }
+    resizeEditor();
     function sendData() {
         var url = '/edit/#{post._id}';
         $.post(url, {title : $('[name=title]').val()?$('[name=title]').val():'test',post : UM.getEditor('myEditor').getContent()}, function(ret){
@@ -31,10 +43,12 @@ script(type="text/javascript").
             if(ret.code == 1)
             {
               var gourl = '/p/#{post._id}';
-                location.href = gourl;
-                return;
+              location.href = gourl;
+              //$.pjax.request({url : gourl}); ?????
+              return;
             }
-            else {
+            else 
+            {
                 alert(ret.message);
             }
         });

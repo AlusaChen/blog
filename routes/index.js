@@ -24,7 +24,6 @@ module.exports = function(app) {
 				isLastPage: ((page - 1) * settings.everyPage + ret.length) == total,
 				success : req.flash('success').toString(),
 				error : req.flash('error').toString(),
-				currentUrl : '/',
 			});
 		});
 	});
@@ -63,7 +62,6 @@ module.exports = function(app) {
 			user : req.session.user,
 			success : req.flash('success').toString(),
 			error : req.flash('error').toString(),
-			currentUrl : '/reg',
 		});
 	});
 
@@ -112,7 +110,6 @@ module.exports = function(app) {
 			user : req.session.user,
 			success : req.flash('success').toString(),
 			error : req.flash('error').toString(),
-			currentUrl : '/login',
 		});
 	});
 
@@ -148,7 +145,6 @@ module.exports = function(app) {
 			tags : settings.tags,
 			success : req.flash('success').toString(),
 			error : req.flash('error').toString(),
-			currentUrl : '/post',
 		});
 	});
 
@@ -195,7 +191,6 @@ module.exports = function(app) {
 				user: req.session.user,
 				success: req.flash('success').toString(),
 				error: req.flash('error').toString(),
-				currentUrl : '/archive',
 			});
 		});
 	});
@@ -213,7 +208,6 @@ module.exports = function(app) {
 				user: req.session.user,
 				success: req.flash('success').toString(),
 				error: req.flash('error').toString(),
-				currentUrl : '/tags',
 			});
 		});
 	});
@@ -230,7 +224,6 @@ module.exports = function(app) {
 				user: req.session.user,
 				success: req.flash('success').toString(),
 				error: req.flash('error').toString(),
-				currentUrl : '/tags',
 			});
 		});
 	});
@@ -241,7 +234,6 @@ module.exports = function(app) {
 			user: req.session.user,
 			success: req.flash('success').toString(),
 			error: req.flash('error').toString(),
-			currentUrl : '/links',
 
 		});
 	});
@@ -258,7 +250,6 @@ module.exports = function(app) {
 				user: req.session.user,
 				success: req.flash('success').toString(),
 				error: req.flash('error').toString(),
-				currentUrl : '/search',
 			});
 		});
 	});
@@ -288,7 +279,6 @@ module.exports = function(app) {
 					user : req.session.user,
 					success : req.flash('success').toString(),
 					error : req.flash('error').toString(),
-					currentUrl : '/u',
 				});
 			});
 		});
@@ -308,7 +298,6 @@ module.exports = function(app) {
 				user: req.session.user,
 				success: req.flash('success').toString(),
 				error: req.flash('error').toString(),
-				currentUrl : '/p',
 			});
 		});
 	});
@@ -360,7 +349,6 @@ module.exports = function(app) {
 				user: req.session.user,
 				success: req.flash('success').toString(),
 				error: req.flash('error').toString(),
-				currentUrl : '/edit',
 			});
 		});
 	});
@@ -408,6 +396,7 @@ module.exports = function(app) {
 			req.flash('success', 'reprint succeed');
 			var url = '/p/' + post._id;
 			res.redirect(url);
+			//res.redirectPjax('article', {post:post});
 		});
 	});
 
@@ -416,7 +405,7 @@ module.exports = function(app) {
 	app.get('/logout', function(req, res) {
 		req.session.user = null;
 		req.flash('success', 'Logout succeed!');
-		return res.redirect('/');
+		res.redirect('/login');
 	});
 
 	app.use(function (req, res) {

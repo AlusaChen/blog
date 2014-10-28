@@ -1,7 +1,4 @@
-link(rel="stylesheet", type="text/css", href="/ueditor/themes/default/css/umeditor.css")
-script(type="text/javascript", src="/ueditor/umeditor.config.js")
-script(type="text/javascript", src="/ueditor/umeditor.min.js")
-script(type="text/javascript", src="/ueditor/lang/zh-cn/zh-cn.js")
+
 article.box.post.post-excerpt
  p
   span Title 
@@ -12,12 +9,26 @@ article.box.post.post-excerpt
    input.article_tags(type="checkbox", name="tags[]", value=tag, id="tag_" + index)
    label(for="tag_" + index)= tag
   - })
- script#myEditor(type="text/plain", style="width:1000px;height:240px;") Contents
+ script#myEditor(type="text/plain") Contents
  br
  button.button(onclick="sendData()") Submit
  .info: span Post
 script(type="text/javascript").
+    UM.clearCache('myEditor'); //for pjax
     var um = UM.getEditor('myEditor');
+
+    function resizeEditor()
+    {
+      $(window).resize(function(){
+        var width = $('#content').width();
+        um.setWidth(width);
+        var height = parseInt(width / 3);
+        um.setHeight(height);
+      });
+    }
+
+    resizeEditor();
+
     function sendData() {
         var article_tags = [];
         $('.article_tags:checked').each(function(index, tag){
@@ -38,7 +49,8 @@ script(type="text/javascript").
 
             if(ret.code == 1)
             {
-                location.href = '/';
+                //location.href = '/';
+                $.pjax.request({url:'/'});
                 return;
             }
             else {

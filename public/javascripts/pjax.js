@@ -191,7 +191,7 @@
 	pjax.showFx = {
 		"_default" : function(data, callback, isCached) {
 			this.html(data);
-			callback && callback.call(this, data, isCached);
+			callback && callback.call(this , data, isCached);
 		},
 		fade: function(data, callback, isCached){
 			var $this = this;
@@ -199,8 +199,8 @@
 				$this.html(data);
 				callback && callback.call($this, data, isCached);
 			}else{
-				this.fadeOut(500, function(){
-					$this.html(data).fadeIn(500, function(){
+				this.fadeOut(100, function(){
+					$this.html(data).fadeIn(100, function(){
 						callback && callback.call($this, data, isCached);
 					});
 				});

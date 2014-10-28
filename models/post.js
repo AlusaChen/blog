@@ -205,7 +205,7 @@ Post.remove = function(name, _id, callback) {
 		},
 		function(db, collection, ret, cb) {
 			var reprint_from = "";
-			if(ret.reprint_info.reprint_from) {
+			if(ret.reprint_info && ret.reprint_info.reprint_from) {
 				reprint_from = ret.reprint_info.reprint_from;
 			}
 

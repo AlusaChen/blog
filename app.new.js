@@ -11,7 +11,8 @@ var path = require('path');
 var MongoStore = require('connect-mongo')(express);
 var settings = require('./settings');
 var flash = require('connect-flash');
-var pjax = require('express-pjax');
+//var pjax = require('express-pjax');
+var pjax = require('express-pjax-redirect');
 
 //handler error log
 
