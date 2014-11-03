@@ -68,9 +68,11 @@ body.left-sidebar
   #content
    .inner
     if success
-     div #{success}
-    if ( error )
-     div #{error}
+     div 
+      #{success}
+    if error
+     div 
+      #{error}
     !=body
   #sidebar
    h1#logo: a(href="/") Micro Blog
@@ -105,7 +107,8 @@ body.left-sidebar
         th(scope="col", tilte=index)= val
       tbody
        tr
-        td.pad(colspan="4"): span&nbsp;
+        td.pad(colspan="4")
+         span &nbsp;
         each val in [1, 2, 3]
          td: span= val
        tr
